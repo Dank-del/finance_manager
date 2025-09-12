@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.App {
+  min-height: 100vh;
+}
+
+.card {
+  padding: 2em;
+}
+
+.health-status {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.health-status h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.health-status p {
+  margin: 0.5rem 0;
+  color: #666;
+}

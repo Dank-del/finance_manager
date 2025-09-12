@@ -1,0 +1,20 @@
+{
+  "name": "finance_manager",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:backend": "bun --cwd apps/backend dev",
+    "dev:frontend": "bun --cwd apps/frontend dev",
+    "build:backend": "bun --cwd apps/backend run build",
+    "build:frontend": "bun --cwd apps/frontend run build",
+    "install:all": "bun install",
+    "clean": "bun --cwd apps/backend run clean && bun --cwd apps/frontend run clean"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}
