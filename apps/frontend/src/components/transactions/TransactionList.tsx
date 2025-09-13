@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Filter } from 'lucide-react';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import { formatCurrency } from '../../utils/currency';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { TransactionForm } from './TransactionForm';
@@ -29,6 +31,7 @@ export const TransactionList = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const { currency } = useCurrency();
   const [filters, setFilters] = useState({
     type: '',
     categoryId: '',
@@ -202,7 +205,7 @@ export const TransactionList = () => {
                   <div className={`text-lg font-semibold ${
                     transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                    {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, currency).substring(1)}
                   </div>
                   <div className="flex items-center gap-2">
                     <button

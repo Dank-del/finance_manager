@@ -30,7 +30,7 @@ export class UserPreferenceController {
   updatePreferences = async (req: AuthRequest, res: Response) => {
     try {
       const schema = Joi.object({
-        currency: Joi.string().valid('USD', 'EUR', 'GBP'),
+        currency: Joi.string().valid('USD', 'EUR', 'GBP', 'INR'),
         theme: Joi.string().valid('light', 'dark', 'system')
       });
 

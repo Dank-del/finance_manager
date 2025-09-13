@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { DollarSign, TrendingUp, TrendingDown, Target, CreditCard, Wallet } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { formatCurrency } from '../utils/currency';
 import axios from 'axios';
 
 interface DashboardStats {
@@ -17,6 +19,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'
 export const Dashboard = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const { currency } = useCurrency();
 
   useEffect(() => {
     fetchStats();
@@ -71,7 +74,7 @@ export const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Total Balance</p>
-              <p className="text-2xl font-bold text-gray-900">${stats.balance.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.balance, currency)}</p>
             </div>
           </div>
         </div>
@@ -83,7 +86,7 @@ export const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Total Income</p>
-              <p className="text-2xl font-bold text-gray-900">${stats.totalIncome.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalIncome, currency)}</p>
             </div>
           </div>
         </div>
@@ -95,7 +98,7 @@ export const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Total Expenses</p>
-              <p className="text-2xl font-bold text-gray-900">${stats.totalExpenses.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalExpenses, currency)}</p>
             </div>
           </div>
         </div>
@@ -108,7 +111,7 @@ export const Dashboard = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Monthly Balance</p>
               <p className="text-2xl font-bold text-gray-900">
-                ${(stats.monthlyIncome - stats.monthlyExpenses).toFixed(2)}
+                {formatCurrency(stats.monthlyIncome - stats.monthlyExpenses, currency)}
               </p>
             </div>
           </div>
@@ -123,7 +126,7 @@ export const Dashboard = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
+              <Tooltip formatter={(value) => [formatCurrency(Number(value), currency), 'Amount']} />
               <Bar dataKey="amount" />
             </BarChart>
           </ResponsiveContainer>
@@ -147,7 +150,7 @@ export const Dashboard = () => {
                   <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
+              <Tooltip formatter={(value) => [formatCurrency(Number(value), currency), 'Amount']} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -172,7 +175,7 @@ export const Dashboard = () => {
                 </div>
               </div>
               <div className={`text-sm font-medium ${item.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                {item.type === 'income' ? '+' : '-'}${item.amount.toFixed(2)}
+                {item.type === 'income' ? '+' : '-'}{formatCurrency(item.amount, currency).substring(1)}
               </div>
             </div>
           ))}

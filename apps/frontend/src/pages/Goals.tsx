@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Target } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { formatCurrency } from '../utils/currency';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -19,6 +21,7 @@ export const Goals = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const { currency } = useCurrency();
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -146,8 +149,8 @@ export const Goals = () => {
                 </div>
               </div>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-bold text-gray-900">${g.currentAmount.toFixed(2)}</span>
-                <span className="text-sm text-gray-500">of ${g.targetAmount.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-gray-900">{formatCurrency(g.currentAmount, currency)}</span>
+                <span className="text-sm text-gray-500">of {formatCurrency(g.targetAmount, currency)}</span>
               </div>
               <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-indigo-600" style={{ width: `${percent}%` }} />

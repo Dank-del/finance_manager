@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LoginForm } from './components/auth/LoginForm';
 import { RegisterForm } from './components/auth/RegisterForm';
@@ -33,12 +34,14 @@ const AppRoutes = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <AppRoutes />
-          <Toaster position="top-right" />
-        </div>
-      </Router>
+      <CurrencyProvider>
+        <Router>
+          <div className="App">
+            <AppRoutes />
+            <Toaster position="top-right" />
+          </div>
+        </Router>
+      </CurrencyProvider>
     </AuthProvider>
   );
 }

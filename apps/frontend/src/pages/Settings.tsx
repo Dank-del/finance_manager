@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useCurrency } from '../contexts/CurrencyContext';
+import type { Currency } from '../utils/currency';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
 export const Settings = () => {
   const { user, token } = useAuth();
+  const { setCurrency } = useCurrency();
   const [profile, setProfile] = useState({ firstName: '', lastName: '' });
-  const [prefs, setPrefs] = useState({ currency: 'USD', theme: 'light' });
+  const [prefs, setPrefs] = useState({ currency: 'USD' as Currency, theme: 'light' });
   const [loading, setLoading] = useState(false);
   const [prefsLoading, setPrefsLoading] = useState(false);
 
@@ -22,7 +25,7 @@ export const Settings = () => {
         const response = await axios.get('/api/preferences', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setPrefs({ currency: response.data.currency, theme: response.data.theme });
+        setPrefs({ currency: response.data.currency as Currency, theme: response.data.theme });
       } catch (error) {
         console.error('Failed to fetch preferences');
       }
@@ -55,6 +58,7 @@ export const Settings = () => {
       await axios.put('/api/preferences', prefs, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      setCurrency(prefs.currency);
       toast.success('Preferences saved successfully');
     } catch (error) {
       toast.error('Failed to save preferences');
@@ -91,10 +95,11 @@ export const Settings = () => {
             <form onSubmit={onSavePrefs} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-                <select value={prefs.currency} onChange={e => setPrefs({ ...prefs, currency: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2">
+                <select value={prefs.currency} onChange={e => setPrefs({ ...prefs, currency: e.target.value as Currency })} className="w-full rounded-md border border-gray-300 px-3 py-2">
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
                   <option value="GBP">GBP</option>
+                  <option value="INR">INR</option>
                 </select>
               </div>
               <div>

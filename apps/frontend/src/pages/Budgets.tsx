@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { formatCurrency } from '../utils/currency';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -30,6 +32,7 @@ export const Budgets = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ categoryId: '', amount: '', period: 'monthly', startDate: '', endDate: '', alertThreshold: '80' });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const { currency } = useCurrency();
 
   useEffect(() => {
     fetchBudgets();
@@ -159,8 +162,8 @@ export const Budgets = () => {
                 </div>
               </div>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-bold text-gray-900">${b.spent.toFixed(2)}</span>
-                <span className="text-sm text-gray-500">of ${b.amount.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-gray-900">{formatCurrency(b.spent, currency)}</span>
+                <span className="text-sm text-gray-500">of {formatCurrency(b.amount, currency)}</span>
               </div>
               <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                 <div className={`h-full ${bar}`} style={{ width: `${percent}%` }} />
