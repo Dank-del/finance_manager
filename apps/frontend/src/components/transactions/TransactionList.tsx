@@ -123,7 +123,7 @@ export const TransactionList = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
         <button
           onClick={() => setShowForm(true)}
@@ -135,7 +135,7 @@ export const TransactionList = () => {
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
-        <div className="flex items-center space-x-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
           <Filter className="h-5 w-5 text-gray-400" />
           <select
             value={filters.type}
@@ -178,8 +178,8 @@ export const TransactionList = () => {
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
         <ul className="divide-y divide-gray-200">
           {transactions.map((transaction) => (
-            <li key={transaction.id} className="px-6 py-4">
-              <div className="flex items-center justify-between">
+            <li key={transaction.id} className="px-4 sm:px-6 py-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center">
                   <div className="text-2xl mr-4">
                     {getCategoryIcon(transaction.categoryId)}
@@ -198,13 +198,13 @@ export const TransactionList = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center justify-between sm:justify-end gap-3">
                   <div className={`text-lg font-semibold ${
                     transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleEdit(transaction)}
                       className="text-indigo-600 hover:text-indigo-900"

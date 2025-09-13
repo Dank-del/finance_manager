@@ -5,6 +5,9 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './src/routes/auth';
 import transactionRoutes from './src/routes/transactions';
 import categoryRoutes from './src/routes/categories';
+import budgetRoutes from './src/routes/budgets';
+import goalRoutes from './src/routes/goals';
+import preferenceRoutes from './src/routes/preferences';
 import { createTables } from './src/database/schema';
 
 const app = express();
@@ -32,6 +35,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/goals', goalRoutes);
+app.use('/api/preferences', preferenceRoutes);
 
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);

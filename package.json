@@ -6,8 +6,9 @@
     "apps/*"
   ],
   "scripts": {
-    "dev:backend": "bun --cwd apps/backend dev",
-    "dev:frontend": "bun --cwd apps/frontend dev",
+  "dev": "bunx npm-run-all -p dev:backend dev:frontend",
+  "dev:backend": "bun run -F @finance-manager/backend dev",
+  "dev:frontend": "bun run -F @finance-manager/frontend dev",
     "build:backend": "bun --cwd apps/backend run build",
     "build:frontend": "bun --cwd apps/frontend run build",
     "install:all": "bun install",

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { query } from '../database/connection';
 import type { User, CreateUserInput, LoginInput, UserResponse } from '../models/User';
@@ -135,8 +135,42 @@ export class AuthService {
     };
   }
 
+  async updateProfile(userId: string, data: { firstName?: string; lastName?: string }): Promise<UserResponse | null> {
+    const fields = Object.keys(data).filter(key => data[key as keyof typeof data] !== undefined);
+    
+    if (fields.length === 0) {
+      return this.getUserById(userId);
+    }
+
+    const setClause = fields.map((field, index) => {
+      const dbField = field === 'firstName' ? 'first_name' : field === 'lastName' ? 'last_name' : field;
+      return `${dbField} = $${index + 2}`;
+    }).join(', ');
+    const values = fields.map(field => data[field as keyof typeof data]);
+
+    const result = await query(`
+      UPDATE users
+      SET ${setClause}, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING id, email, first_name, last_name, created_at
+    `, [userId, ...values]);
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const user = result.rows[0];
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      createdAt: user.created_at
+    };
+  }
+
   private generateToken(userId: string): string {
-    const options: jwt.SignOptions = { expiresIn: this.jwtExpiresIn };
+    const options: SignOptions = { expiresIn: this.jwtExpiresIn as any };
     return jwt.sign({ userId }, this.jwtSecret, options);
   }
 }

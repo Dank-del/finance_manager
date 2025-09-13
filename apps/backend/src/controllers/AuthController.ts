@@ -97,4 +97,26 @@ export class AuthController {
       res.status(500).json({ error: (error as Error).message });
     }
   };
+
+  updateProfile = async (req: AuthRequest, res: Response) => {
+    try {
+      const schema = Joi.object({
+        firstName: Joi.string(),
+        lastName: Joi.string()
+      });
+
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ error: error.details?.[0]?.message || error.message });
+      }
+
+      const user = await this.authService.updateProfile(req.userId!, value);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  };
 }

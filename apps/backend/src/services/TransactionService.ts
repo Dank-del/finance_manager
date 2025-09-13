@@ -1,5 +1,6 @@
 import { query } from '../database/connection';
 import type { Transaction, CreateTransactionInput, UpdateTransactionInput } from '../models/Transaction';
+import { BudgetService } from './BudgetService';
 
 interface TransactionFilters {
   page: number;
@@ -20,6 +21,8 @@ interface TransactionStats {
 }
 
 export class TransactionService {
+  private budgetService = new BudgetService();
+
   async create(userId: string, data: CreateTransactionInput): Promise<Transaction> {
     const {
       amount,
@@ -44,7 +47,13 @@ export class TransactionService {
       isRecurring, recurringPeriod, recurringEndDate
     ]);
 
-    return this.mapTransaction(result.rows[0]);
+    const transaction = this.mapTransaction(result.rows[0]);
+
+    if (type === 'expense') {
+      await this.budgetService.updateSpent(userId, categoryId);
+    }
+
+    return transaction;
   }
 
   async getAll(userId: string, filters: TransactionFilters): Promise<{
@@ -124,10 +133,15 @@ export class TransactionService {
   }
 
   async update(userId: string, id: string, data: UpdateTransactionInput): Promise<Transaction | null> {
+    const originalTransaction = await this.getById(userId, id);
+    if (!originalTransaction) {
+      return null;
+    }
+
     const fields = Object.keys(data).filter(key => data[key as keyof UpdateTransactionInput] !== undefined);
     
     if (fields.length === 0) {
-      return this.getById(userId, id);
+      return originalTransaction;
     }
 
     const setClause = fields.map((field, index) => `${this.mapFieldName(field)} = $${index + 3}`).join(', ');
@@ -140,16 +154,42 @@ export class TransactionService {
       RETURNING *
     `, [id, userId, ...values]);
 
-    return result.rows.length > 0 ? this.mapTransaction(result.rows[0]) : null;
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const updatedTransaction = this.mapTransaction(result.rows[0]);
+
+    if (originalTransaction.type === 'expense' || updatedTransaction.type === 'expense') {
+      if (originalTransaction.categoryId !== updatedTransaction.categoryId) {
+        await this.budgetService.updateSpent(userId, originalTransaction.categoryId);
+        await this.budgetService.updateSpent(userId, updatedTransaction.categoryId);
+      } else {
+        await this.budgetService.updateSpent(userId, updatedTransaction.categoryId);
+      }
+    }
+
+    return updatedTransaction;
   }
 
   async delete(userId: string, id: string): Promise<boolean> {
+    const transaction = await this.getById(userId, id);
+    if (!transaction) {
+      return false;
+    }
+
     const result = await query(
       'DELETE FROM transactions WHERE id = $1 AND user_id = $2',
       [id, userId]
     );
 
-    return (result.rowCount ?? 0) > 0;
+    const deleted = (result.rowCount ?? 0) > 0;
+
+    if (deleted && transaction.type === 'expense') {
+      await this.budgetService.updateSpent(userId, transaction.categoryId);
+    }
+
+    return deleted;
   }
 
   async getStats(userId: string): Promise<TransactionStats> {

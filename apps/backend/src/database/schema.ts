@@ -112,11 +112,35 @@ export const createTables = async () => {
     CREATE INDEX IF NOT EXISTS idx_goals_priority ON goals(priority);
   `);
 
+  await query(`
+    CREATE TABLE IF NOT EXISTS user_preferences (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      currency VARCHAR(3) DEFAULT 'USD',
+      theme VARCHAR(10) DEFAULT 'light',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id)
+    );
+  `);
+
+  await query(`
+    CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences(user_id);
+  `);
+
   await insertDefaultCategories();
 };
 
 const insertDefaultCategories = async () => {
   const { query } = await import('./connection');
+  
+  const existingDefaults = await query(`
+    SELECT COUNT(*) as count FROM categories WHERE is_default = true
+  `);
+  
+  if (existingDefaults.rows[0].count > 0) {
+    return;
+  }
   
   const defaultCategories = [
     { name: 'Salary', type: 'income', color: '#10b981', icon: '💰' },
@@ -133,7 +157,6 @@ const insertDefaultCategories = async () => {
     await query(`
       INSERT INTO categories (name, type, color, icon, is_default)
       VALUES ($1, $2, $3, $4, true)
-      ON CONFLICT DO NOTHING
     `, [category.name, category.type, category.color, category.icon]);
   }
 };
