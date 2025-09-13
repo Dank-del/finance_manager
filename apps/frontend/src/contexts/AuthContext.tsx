@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/auth/profile`);
+      const response = await axios.get('/auth/profile');
       setUser(response.data);
     } catch (error) {
       localStorage.removeItem('token');
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+    const response = await axios.post('/auth/login', {
       email,
       password,
     });
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const register = async (email: string, password: string, firstName: string, lastName: string) => {
-    const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+    const response = await axios.post('/auth/register', {
       email,
       password,
       firstName,

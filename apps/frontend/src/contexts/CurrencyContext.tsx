@@ -7,6 +7,8 @@ import axios from 'axios';
 interface CurrencyContextType {
   currency: Currency;
   setCurrency: (currency: Currency) => void;
+  theme: 'light' | 'dark' | 'system';
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
   loading: boolean;
 }
 
@@ -26,37 +28,53 @@ interface CurrencyProviderProps {
 
 export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
   const [currency, setCurrencyState] = useState<Currency>('USD');
+  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>('light');
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
   useEffect(() => {
-    const fetchUserCurrency = async () => {
+    const fetchUserPreferences = async () => {
       if (!token) {
         setLoading(false);
         return;
       }
 
       try {
-        const response = await axios.get('/api/preferences', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await axios.get('/preferences');
         setCurrencyState(response.data.currency as Currency);
+        setThemeState(response.data.theme as 'light' | 'dark' | 'system');
       } catch (error) {
-        console.error('Failed to fetch user currency preference');
+        console.error('Failed to fetch user preferences');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserCurrency();
+    fetchUserPreferences();
   }, [token]);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+  }, [theme]);
 
   const setCurrency = (newCurrency: Currency) => {
     setCurrencyState(newCurrency);
   };
 
+  const setTheme = (newTheme: 'light' | 'dark' | 'system') => {
+    setThemeState(newTheme);
+  };
+
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, loading }}>
+    <CurrencyContext.Provider value={{ currency, setCurrency, theme, setTheme, loading }}>
       {children}
     </CurrencyContext.Provider>
   );
