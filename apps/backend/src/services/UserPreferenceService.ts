@@ -74,12 +74,24 @@ export class UserPreferenceService {
   }
 
   async upsert(userId: string, data: CreateUserPreferenceInput): Promise<UserPreference> {
-    const existing = await this.getByUserId(userId);
-    
-    if (existing) {
-      return this.update(userId, data) as Promise<UserPreference>;
-    } else {
-      return this.create(userId, data);
-    }
+    const result = await query(`
+      INSERT INTO user_preferences (user_id, currency, theme)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (user_id) DO UPDATE SET
+        currency = EXCLUDED.currency,
+        theme = EXCLUDED.theme,
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `, [userId, data.currency, data.theme]);
+
+    const pref = result.rows[0];
+    return {
+      id: pref.id,
+      userId: pref.user_id,
+      currency: pref.currency,
+      theme: pref.theme,
+      createdAt: pref.created_at,
+      updatedAt: pref.updated_at
+    };
   }
 }
