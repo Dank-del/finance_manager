@@ -28,7 +28,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "3001:3001"
+      - "3231:3001"
     networks:
       - finance_manager
     restart: unless-stopped
@@ -41,7 +41,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "3000:80"
+      - "3232:80"
     networks:
       - finance_manager
     restart: unless-stopped
