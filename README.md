@@ -72,6 +72,7 @@ Copy `.env.example` to `.env` and configure:
 - `POSTGRES_USER`: Database user
 - `POSTGRES_PASSWORD`: Database password
 - `JWT_SECRET`: JWT signing secret (change in production)
+- `VITE_API_BASE_URL`: Frontend API base URL (default: `/api` for nginx proxy)
 
 ## Project Structure
 
