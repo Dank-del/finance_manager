@@ -20,7 +20,7 @@ const limiter = rateLimit({
 });
 
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:5173'], // Allow frontend dev server and Vite dev server
+  origin: true, // Allow all origins since frontend and backend are on same port
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
