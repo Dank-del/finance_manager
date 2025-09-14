@@ -27,8 +27,8 @@ interface CurrencyProviderProps {
 }
 
 export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
-  const [currency, setCurrencyState] = useState<Currency>('USD');
-  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>('light');
+  const [currency, setCurrencyState] = useState<Currency>(() => (localStorage.getItem('currency') as Currency) || 'USD');
+  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>(() => (localStorage.getItem('theme') as 'light' | 'dark' | 'system') || 'light');
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
@@ -41,8 +41,12 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
 
       try {
         const response = await axios.get('/preferences');
-        setCurrencyState(response.data.currency as Currency);
-        setThemeState(response.data.theme as 'light' | 'dark' | 'system');
+        const fetchedCurrency = response.data.currency as Currency;
+        const fetchedTheme = response.data.theme as 'light' | 'dark' | 'system';
+        setCurrencyState(fetchedCurrency);
+        setThemeState(fetchedTheme);
+        localStorage.setItem('currency', fetchedCurrency);
+        localStorage.setItem('theme', fetchedTheme);
       } catch (error) {
         console.error('Failed to fetch user preferences');
       } finally {
@@ -67,10 +71,12 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
 
   const setCurrency = (newCurrency: Currency) => {
     setCurrencyState(newCurrency);
+    localStorage.setItem('currency', newCurrency);
   };
 
   const setTheme = (newTheme: 'light' | 'dark' | 'system') => {
     setThemeState(newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
   return (
