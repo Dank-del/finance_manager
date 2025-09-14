@@ -2,10 +2,12 @@ FROM oven/bun:1
 
 WORKDIR /app
 
-COPY package*.json bun.lock ./
+COPY bun.lock ./
+COPY apps/backend/package.json ./
+
 RUN bun install --frozen-lockfile
 
-COPY . .
+COPY apps/backend/ ./
 
 RUN bun run build
 
